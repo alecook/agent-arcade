@@ -7,6 +7,7 @@ type PluginOptions = {
     commandName?: unknown;
     keybind?: unknown;
     args?: unknown;
+    nodePath?: unknown;
 };
 
 type TuiApi = {
@@ -40,6 +41,7 @@ const plugin = {
     tui: async (api: TuiApi, options: PluginOptions = {}) => {
         const commandName = typeof options.commandName === 'string' ? options.commandName : 'arcade';
         const keybind = typeof options.keybind === 'string' ? options.keybind : undefined;
+        const nodePath = typeof options.nodePath === 'string' ? options.nodePath : 'node';
         const cliArgs = readCliArgs(options.args);
 
         api.command?.register(() => [
@@ -54,7 +56,7 @@ const plugin = {
                 },
                 onSelect: async (dialog?: { clear(): void }) => {
                     dialog?.clear();
-                    await runInCurrentTerminal(api, cliArgs);
+                    await runInCurrentTerminal(api, nodePath, cliArgs);
                 },
             },
         ]);
@@ -63,13 +65,13 @@ const plugin = {
 
 export default plugin;
 
-async function runInCurrentTerminal(api: TuiApi, args: string[]): Promise<void> {
+async function runInCurrentTerminal(api: TuiApi, nodePath: string, args: string[]): Promise<void> {
     api.renderer.suspend();
     api.renderer.currentRenderBuffer.clear();
 
     try {
         await new Promise<void>((resolve, reject) => {
-            const child = spawn(process.execPath, [cliPath, ...args], {
+            const child = spawn(nodePath, [cliPath, ...args], {
                 cwd: api.state.path.directory,
                 stdio: 'inherit',
                 shell: false,

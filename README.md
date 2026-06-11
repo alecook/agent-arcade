@@ -103,6 +103,7 @@ The arcade takes over the current terminal buffer. Quit the arcade to return to 
 - `commandName`: slash command name. Default: `arcade`.
 - `keybind`: optional keybind for launching without prompt input.
 - `args`: string array passed to the packaged `agent-arcade` CLI. Default: `["--mock"]`.
+- `nodePath`: Node executable used to run the arcade CLI. Default: `node`.
 
 ## Development
 

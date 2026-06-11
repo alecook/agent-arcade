@@ -1,36 +1,35 @@
 # Agent Arcade
 
-Terminal games for waiting while coding agents work.
+Terminal games for passing time while coding agents work.
 
-This is intentionally dependency-free for the first pass. It uses Node built-ins and ANSI terminal control directly.
+Agent Arcade runs as a standalone CLI and as an Opencode TUI plugin. The Opencode plugin registers `/arcade`, suspends Opencode's renderer, runs the arcade in the current terminal buffer, and resumes Opencode when the arcade exits.
 
-## Run
+The first game is `Raid Peg Drop`, a small fantasy peg-drop prototype. The package is dependency-free and uses Node built-ins plus ANSI terminal control.
+
+## Requirements
+
+- Node.js 20 or newer
+- Opencode with TUI plugin support
+
+## CLI Usage
+
+From a clone:
 
 ```bash
 npm run start -- --mock
 ```
 
-Or after linking/installing:
+After installing or linking the package:
 
 ```bash
 agent-arcade --mock
 ```
 
-## Controls
+## Opencode Setup
 
-- `up` / `down` or `j` / `k`: move through menus
-- `enter` / `space`: select or drop the orb
-- `left` / `right`: aim in Raid Peg Drop
-- `r`: reset Raid Peg Drop
-- `q` / `escape`: back or quit
+Add Agent Arcade to `~/.config/opencode/tui.json`.
 
-## Opencode TUI Plugin
-
-Use the TUI plugin when you want `/arcade` to take over the current terminal buffer without sending anything to the agent.
-
-### From npm
-
-After this package is published, add this to `~/.config/opencode/tui.json`:
+Installed from npm:
 
 ```json
 {
@@ -48,11 +47,7 @@ After this package is published, add this to `~/.config/opencode/tui.json`:
 }
 ```
 
-Opencode loads the package's `./tui` export automatically.
-
-### From a Local Clone
-
-For local testing, add the package directory to `~/.config/opencode/tui.json`:
+Loaded from a local clone:
 
 ```json
 {
@@ -70,54 +65,61 @@ For local testing, add the package directory to `~/.config/opencode/tui.json`:
 }
 ```
 
-Restart Opencode after changing TUI plugin config. Then run:
+Restart Opencode after changing `tui.json`.
+
+## Opencode Usage
+
+Run the slash command:
 
 ```text
 /arcade
 ```
 
-Or use the configured keybind.
+Or use the configured keybind:
 
-The TUI plugin suspends Opencode's renderer, runs Agent Arcade in the same terminal, then resumes Opencode when you quit the arcade. The agent/server side continues running while the arcade owns the terminal.
+```text
+ctrl+shift+a
+```
 
-Plugin options:
+The arcade takes over the current terminal buffer. Quit the arcade to return to Opencode.
 
-- `commandName`: slash command name. Defaults to `arcade`.
+## Controls
+
+- `up` / `down` or `j` / `k`: move through menus
+- `enter` / `space`: select menu items or drop the orb
+- `left` / `right`: aim in Raid Peg Drop
+- `r`: reset Raid Peg Drop
+- `q` / `escape`: back or quit
+
+## Plugin Options
+
+- `commandName`: slash command name. Default: `arcade`.
 - `keybind`: optional keybind for launching without prompt input.
-- `args`: optional string array passed to the packaged `agent-arcade` CLI. Defaults to `["--mock"]`.
+- `args`: string array passed to the packaged `agent-arcade` CLI. Default: `["--mock"]`.
+
+## Development
+
+```bash
+npm run check
+npm run smoke
+```
+
+`npm run check` validates JavaScript syntax. `npm run smoke` prints CLI help.
 
 ## Packaging
 
-Run the package checks:
+Preview package contents:
 
 ```bash
-npm run smoke
 npm run pack:dry-run
 ```
 
-Create a distributable tarball:
+Create a tarball:
 
 ```bash
 npm pack
 ```
 
-This produces a file like:
-
-```text
-agent-arcade-0.1.0.tgz
-```
-
-For the easiest external testing before publishing, send people a repository link or archive and have them use the local-clone `file:///.../agent-arcade` config above.
-
-To publish publicly:
-
-```bash
-npm login
-npm publish
-```
-
-If the unscoped `agent-arcade` package name is unavailable, rename the package to a scoped name such as `@your-scope/agent-arcade`, then users should reference that scoped package in `tui.json`.
-
 ## Notes
 
-Raid Peg Drop is a fantasy peg-drop prototype inspired by arcade pachinko-style games. It avoids third-party names and assets so this can become a public package later.
+Raid Peg Drop is inspired by pachinko-style arcade games. It avoids third-party names and assets so the project can stay public-package friendly.

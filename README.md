@@ -157,6 +157,3 @@ If `/arcade` flashes and exits with code `1`, verify that `node` is available in
 
 If Opencode does not return after quitting the arcade, rebuild the local clone with `npm run build` and restart Opencode so it reloads the latest TUI plugin.
 
-## Notes
-
-Raid Peg Drop is inspired by pachinko-style arcade games. It avoids third-party names and assets so the project can stay public-package friendly.

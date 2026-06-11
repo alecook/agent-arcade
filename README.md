@@ -4,7 +4,7 @@ Terminal games for passing time while coding agents work.
 
 Agent Arcade runs as a standalone CLI and as an Opencode TUI plugin. The Opencode plugin registers `/arcade`, suspends Opencode's renderer, runs the arcade in the current terminal buffer, and resumes Opencode when the arcade exits.
 
-The first game is `Raid Peg Drop`, a small fantasy peg-drop prototype. The package is dependency-free and uses Node built-ins plus ANSI terminal control.
+The first game is `Raid Peg Drop`, a small fantasy peg-drop prototype. The runtime is dependency-free and uses Node built-ins plus ANSI terminal control. The source is TypeScript and publishes compiled JavaScript from `dist`.
 
 ## Requirements
 
@@ -72,6 +72,25 @@ npm run build
 }
 ```
 
+If Opencode cannot find the right Node executable, set `nodePath` explicitly:
+
+```json
+{
+  "$schema": "https://opencode.ai/tui.json",
+  "plugin": [
+    [
+      "file:///path/to/agent-arcade",
+      {
+        "commandName": "arcade",
+        "keybind": "ctrl+shift+a",
+        "args": ["--mock"],
+        "nodePath": "/absolute/path/to/node"
+      }
+    ]
+  ]
+}
+```
+
 Restart Opencode after changing `tui.json`.
 
 ## Opencode Usage
@@ -129,6 +148,14 @@ Create a tarball:
 ```bash
 npm pack
 ```
+
+`npm pack` runs `npm run build` first and packages the compiled `dist` files, README, license, and package metadata.
+
+## Troubleshooting
+
+If `/arcade` flashes and exits with code `1`, verify that `node` is available in Opencode's environment or set `nodePath` to an absolute Node executable path.
+
+If Opencode does not return after quitting the arcade, rebuild the local clone with `npm run build` and restart Opencode so it reloads the latest TUI plugin.
 
 ## Notes
 

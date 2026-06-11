@@ -1,16 +1,21 @@
 import { StringDecoder } from 'node:string_decoder';
 
+import type { Key } from './types.js';
+
+type KeyHandler = (key: Key) => void;
+type CleanupHandler = () => void;
+
 export function createTerminal() {
     const decoder = new StringDecoder('utf8');
-    const keyHandlers = new Set();
-    const cleanupHandlers = new Set();
+    const keyHandlers = new Set<KeyHandler>();
+    const cleanupHandlers = new Set<CleanupHandler>();
     let isStarted = false;
 
-    function write(value) {
+    function write(value: string): void {
         process.stdout.write(value);
     }
 
-    function onData(data) {
+    function onData(data: Buffer): void {
         const value = decoder.write(data);
         const key = parseKey(value);
 
@@ -19,7 +24,7 @@ export function createTerminal() {
         }
     }
 
-    function cleanup() {
+    function cleanup(): void {
         if (!isStarted) {
             return;
         }
@@ -34,7 +39,7 @@ export function createTerminal() {
         }
     }
 
-    function start() {
+    function start(): void {
         if (isStarted) {
             return;
         }
@@ -63,12 +68,12 @@ export function createTerminal() {
         clear() {
             write('\x1b[2J\x1b[H');
         },
-        onKey(handler) {
+        onKey(handler: KeyHandler) {
             keyHandlers.add(handler);
 
             return () => keyHandlers.delete(handler);
         },
-        onCleanup(handler) {
+        onCleanup(handler: CleanupHandler) {
             cleanupHandlers.add(handler);
 
             return () => cleanupHandlers.delete(handler);
@@ -82,7 +87,7 @@ export function createTerminal() {
     };
 }
 
-function parseKey(value) {
+function parseKey(value: string): Key {
     switch (value) {
         case '\u0003':
             return { name: 'ctrl-c' };

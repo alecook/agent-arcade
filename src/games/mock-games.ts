@@ -1,6 +1,19 @@
 import { bright, centerBlock, cyan, dim, style } from '../arcade-app.js';
+import type { Game, Key, Terminal } from '../types.js';
 
-export function createGames() {
+type PlaceholderGameInput = {
+    title: string;
+    description: string;
+    body: string;
+};
+
+type Ball = {
+    x: number;
+    y: number;
+    vx: number;
+};
+
+export function createGames(): Game[] {
     return [
         createRaidPegDropGame(),
         createPlaceholderGame({
@@ -16,23 +29,23 @@ export function createGames() {
     ];
 }
 
-function createRaidPegDropGame() {
+function createRaidPegDropGame(): Game {
     return {
         title: 'Raid Peg Drop',
         description: 'A tiny fantasy peg-drop prototype',
-        createSession({ terminal, exit }) {
+        createSession({ terminal, exit }: { terminal: Terminal; exit: () => void }) {
             const width = 37;
             const height = 17;
             let launcher = Math.floor(width / 2);
             let score = 0;
             let drops = 5;
             let message = 'Move with left/right, drop with space.';
-            let ball = null;
-            let timer = null;
+            let ball: Ball | null = null;
+            let timer: NodeJS.Timeout | null = null;
             let pegs = createPegMap(width, height);
 
-            function render() {
-                const board = [];
+            function render(): void {
+                const board: string[] = [];
 
                 for (let y = 0; y < height; y += 1) {
                     let row = '';
@@ -73,7 +86,7 @@ function createRaidPegDropGame() {
                 terminal.write(centerBlock(lines, terminal.size().columns, terminal.size().rows));
             }
 
-            function handleKey(key) {
+            function handleKey(key: Key): void {
                 if (key.name === 'q' || key.name === 'escape') {
                     dispose();
                     exit();
@@ -112,7 +125,7 @@ function createRaidPegDropGame() {
                 }
             }
 
-            function dropBall() {
+            function dropBall(): void {
                 if (drops <= 0) {
                     message = 'No drops left. Press r to reset.';
                     render();
@@ -125,7 +138,7 @@ function createRaidPegDropGame() {
                 timer = setInterval(tick, 70);
             }
 
-            function tick() {
+            function tick(): void {
                 if (!ball) {
                     return;
                 }
@@ -153,14 +166,16 @@ function createRaidPegDropGame() {
                     score += bonus;
                     message = bonus >= 250 ? 'Critical bucket. Loot sparks everywhere.' : 'Clean drop. Modest loot.';
                     ball = null;
-                    clearInterval(timer);
-                    timer = null;
+                    if (timer) {
+                        clearInterval(timer);
+                        timer = null;
+                    }
                 }
 
                 render();
             }
 
-            function dispose() {
+            function dispose(): void {
                 if (timer) {
                     clearInterval(timer);
                     timer = null;
@@ -176,12 +191,12 @@ function createRaidPegDropGame() {
     };
 }
 
-function createPlaceholderGame({ title, description, body }) {
+function createPlaceholderGame({ title, description, body }: PlaceholderGameInput): Game {
     return {
         title,
         description,
-        createSession({ terminal, exit }) {
-            function render() {
+        createSession({ terminal, exit }: { terminal: Terminal; exit: () => void }) {
+            function render(): void {
                 const lines = [
                     style(title, 'title'),
                     '',
@@ -194,7 +209,7 @@ function createPlaceholderGame({ title, description, body }) {
                 terminal.write(centerBlock(lines, terminal.size().columns, terminal.size().rows));
             }
 
-            function handleKey(key) {
+            function handleKey(key: Key): void {
                 if (key.name === 'q' || key.name === 'escape') {
                     exit();
                 }
@@ -209,8 +224,8 @@ function createPlaceholderGame({ title, description, body }) {
     };
 }
 
-function createPegMap(width, height) {
-    const pegs = new Set();
+function createPegMap(width: number, height: number): Set<string> {
+    const pegs = new Set<string>();
 
     for (let y = 2; y < height - 2; y += 2) {
         const offset = y % 4 === 0 ? 3 : 0;
@@ -223,7 +238,7 @@ function createPegMap(width, height) {
     return pegs;
 }
 
-function randomHitMessage() {
+function randomHitMessage(): string {
     const messages = [
         'Peg hit. Tiny boss health bar moves.',
         'Combo ping. The raid approves.',
@@ -231,5 +246,5 @@ function randomHitMessage() {
         'Loot peg shattered.',
     ];
 
-    return messages[Math.floor(Math.random() * messages.length)];
+    return messages[Math.floor(Math.random() * messages.length)] ?? messages[0];
 }

@@ -3,11 +3,43 @@ import { fileURLToPath } from 'node:url';
 
 const cliPath = fileURLToPath(new URL('../cli.js', import.meta.url));
 
+type PluginOptions = {
+    commandName?: unknown;
+    keybind?: unknown;
+    args?: unknown;
+};
+
+type TuiApi = {
+    command?: {
+        register(callback: () => unknown[]): void;
+    };
+    renderer: {
+        suspend(): void;
+        resume(): void;
+        requestRender(): void;
+        currentRenderBuffer: {
+            clear(): void;
+        };
+    };
+    state: {
+        path: {
+            directory: string;
+        };
+    };
+    ui: {
+        toast(input: {
+            variant: 'error';
+            title: string;
+            message: string;
+        }): void;
+    };
+};
+
 const plugin = {
     id: 'agent-arcade',
-    tui: async (api, options = {}) => {
-        const commandName = options.commandName ?? 'arcade';
-        const keybind = options.keybind;
+    tui: async (api: TuiApi, options: PluginOptions = {}) => {
+        const commandName = typeof options.commandName === 'string' ? options.commandName : 'arcade';
+        const keybind = typeof options.keybind === 'string' ? options.keybind : undefined;
         const cliArgs = readCliArgs(options.args);
 
         api.command?.register(() => [
@@ -20,7 +52,7 @@ const plugin = {
                 slash: {
                     name: commandName,
                 },
-                onSelect: async (dialog) => {
+                onSelect: async (dialog?: { clear(): void }) => {
                     dialog?.clear();
                     await runInCurrentTerminal(api, cliArgs);
                 },
@@ -31,12 +63,12 @@ const plugin = {
 
 export default plugin;
 
-async function runInCurrentTerminal(api, args) {
+async function runInCurrentTerminal(api: TuiApi, args: string[]): Promise<void> {
     api.renderer.suspend();
     api.renderer.currentRenderBuffer.clear();
 
     try {
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
             const child = spawn(process.execPath, [cliPath, ...args], {
                 cwd: api.state.path.directory,
                 stdio: 'inherit',
@@ -66,7 +98,7 @@ async function runInCurrentTerminal(api, args) {
     }
 }
 
-function readCliArgs(args) {
+function readCliArgs(args: unknown): string[] {
     if (!Array.isArray(args)) {
         return ['--mock'];
     }

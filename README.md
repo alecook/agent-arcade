@@ -16,6 +16,8 @@ The first game is `Raid Peg Drop`, a small fantasy peg-drop prototype. The packa
 From a clone:
 
 ```bash
+npm install
+npm run build
 npm run start -- --mock
 ```
 
@@ -48,6 +50,11 @@ Installed from npm:
 ```
 
 Loaded from a local clone:
+
+```bash
+npm install
+npm run build
+```
 
 ```json
 {
@@ -100,11 +107,13 @@ The arcade takes over the current terminal buffer. Quit the arcade to return to 
 ## Development
 
 ```bash
+npm install
+npm run build
 npm run check
 npm run smoke
 ```
 
-`npm run check` validates JavaScript syntax. `npm run smoke` prints CLI help.
+`npm run build` compiles TypeScript into `dist`. `npm run check` runs TypeScript without emitting files. `npm run smoke` prints CLI help from the built CLI.
 
 ## Packaging
 

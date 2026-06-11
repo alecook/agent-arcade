@@ -1,16 +1,21 @@
 import { createTerminal } from './terminal.js';
 import { createGames } from './games/mock-games.js';
+import type { Game, GameSession } from './types.js';
 
-export async function runArcade({ isMockMode = true } = {}) {
+type RunArcadeOptions = {
+    isMockMode?: boolean;
+};
+
+export async function runArcade({ isMockMode = true }: RunArcadeOptions = {}): Promise<void> {
     const terminal = createTerminal();
     const games = createGames();
     let selectedIndex = 0;
     let currentScreen = 'menu';
-    let activeGame = null;
-    let unsubscribeGame = null;
-    let resolveDone;
+    let activeGame: GameSession | null = null;
+    let unsubscribeGame: (() => void) | null = null;
+    let resolveDone: () => void;
 
-    const done = new Promise((resolve) => {
+    const done = new Promise<void>((resolve) => {
         resolveDone = resolve;
     });
 
@@ -61,7 +66,7 @@ export async function runArcade({ isMockMode = true } = {}) {
 
     await done;
 
-    function renderMenu() {
+    function renderMenu(): void {
         currentScreen = 'menu';
         activeGame = null;
         unsubscribeGame?.();
@@ -82,7 +87,11 @@ export async function runArcade({ isMockMode = true } = {}) {
         terminal.write(centerBlock(lines, terminal.size().columns, terminal.size().rows));
     }
 
-    function openGame(game) {
+    function openGame(game: Game | undefined): void {
+        if (!game) {
+            return;
+        }
+
         currentScreen = 'game';
         activeGame = game.createSession({
             terminal,
@@ -92,21 +101,21 @@ export async function runArcade({ isMockMode = true } = {}) {
         activeGame.render();
     }
 
-    function formatMenuLine(index, title, description) {
+    function formatMenuLine(index: number, title: string, description: string): string {
         const marker = index === selectedIndex ? cyan('>') : ' ';
         const label = index === selectedIndex ? bright(title) : title;
 
         return `${marker} ${label} ${dim('- ' + description)}`;
     }
 
-    function quit() {
+    function quit(): void {
         unsubscribeGame?.();
         terminal.cleanup();
         resolveDone();
     }
 }
 
-export function centerBlock(lines, columns, rows) {
+export function centerBlock(lines: string[], columns: number, rows: number): string {
     const width = Math.max(...lines.map(stripAnsi).map((line) => line.length));
     const leftPadding = Math.max(0, Math.floor((columns - width) / 2));
     const topPadding = Math.max(0, Math.floor((rows - lines.length) / 3));
@@ -115,7 +124,7 @@ export function centerBlock(lines, columns, rows) {
     return `${'\n'.repeat(topPadding)}${lines.map((line) => `${pad}${line}`).join('\n')}`;
 }
 
-export function style(value, name) {
+export function style(value: string, name: string): string {
     if (name === 'title') {
         return `\x1b[38;5;220m\x1b[1m${value}\x1b[0m`;
     }
@@ -123,18 +132,18 @@ export function style(value, name) {
     return value;
 }
 
-export function bright(value) {
+export function bright(value: string): string {
     return `\x1b[1m${value}\x1b[0m`;
 }
 
-export function cyan(value) {
+export function cyan(value: string): string {
     return `\x1b[38;5;81m${value}\x1b[0m`;
 }
 
-export function dim(value) {
+export function dim(value: string): string {
     return `\x1b[2m${value}\x1b[0m`;
 }
 
-function stripAnsi(value) {
+function stripAnsi(value: string): string {
     return value.replace(/\x1b\[[0-9;?]*[a-zA-Z]/g, '');
 }

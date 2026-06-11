@@ -24,7 +24,10 @@ if (!process.stdin.isTTY || !process.stdout.isTTY) {
     process.exit(1);
 }
 
-runArcade({ isMockMode: args.has('--mock') }).catch((error) => {
+try {
+    await runArcade({ isMockMode: args.has('--mock') });
+    process.exit(0);
+} catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     process.exit(1);
-});
+}

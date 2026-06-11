@@ -32,6 +32,7 @@ export function createTerminal() {
         isStarted = false;
         process.stdin.off('data', onData);
         process.stdin.setRawMode(false);
+        process.stdin.pause();
         write('\x1b[?25h\x1b[?1049l');
 
         for (const handler of cleanupHandlers) {

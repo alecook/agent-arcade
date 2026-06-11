@@ -1,0 +1,44 @@
+{
+    "name": "agent-arcade",
+    "version": "0.1.0",
+    "description": "A terminal arcade launcher for passing time while coding agents work.",
+    "license": "MIT",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/alecook/agent-arcade.git"
+    },
+    "bugs": {
+        "url": "https://github.com/alecook/agent-arcade/issues"
+    },
+    "homepage": "https://github.com/alecook/agent-arcade#readme",
+    "keywords": [
+        "opencode",
+        "tui",
+        "terminal",
+        "arcade",
+        "plugin"
+    ],
+    "bin": {
+        "agent-arcade": "./src/cli.js"
+    },
+    "exports": {
+        ".": "./src/index.js",
+        "./tui": "./src/integrations/opencode-tui-plugin.js",
+        "./opencode-tui-plugin": "./src/integrations/opencode-tui-plugin.js"
+    },
+    "files": [
+        "src",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "start": "node src/cli.js",
+        "smoke": "node src/cli.js --help",
+        "check": "node --check src/cli.js && node --check src/arcade-app.js && node --check src/terminal.js && node --check src/games/mock-games.js && node --check src/integrations/opencode-tui-plugin.js",
+        "pack:dry-run": "npm pack --dry-run"
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    }
+}

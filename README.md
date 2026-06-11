@@ -4,7 +4,9 @@ Terminal games for passing time while coding agents work.
 
 Agent Arcade runs as a standalone CLI and as an Opencode TUI plugin. The Opencode plugin registers `/arcade`, suspends Opencode's renderer, runs the arcade in the current terminal buffer, and resumes Opencode when the arcade exits.
 
-The first game is `Raid Peg Drop`, a small fantasy peg-drop prototype. The runtime is dependency-free and uses Node built-ins plus ANSI terminal control. The source is TypeScript and publishes compiled JavaScript from `dist`.
+Games are located in src/games. Eventually will build out the games ecosystem to pull in any TUI based game. 
+
+The runtime is dependency-free and uses Node built-ins plus ANSI terminal control. The source is TypeScript and publishes compiled JavaScript from `dist`.
 
 ## Requirements
 
